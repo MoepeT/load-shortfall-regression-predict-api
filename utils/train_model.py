@@ -8,7 +8,6 @@
     purposes.
 
 """
-
 # Dependencies
 import pandas as pd
 import pickle
