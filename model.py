@@ -53,7 +53,7 @@ def _preprocess_data(data):
 
     return predict_vector
 
-def load_model(path_to_model:str):
+#def load_model(path_to_model:str):
     """Adapter function to load our pretrained model into memory.
     Parameters
     ----------
