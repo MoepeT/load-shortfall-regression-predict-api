@@ -22,14 +22,18 @@ import requests
 import pandas as pd
 import numpy as np
 import json
-import csv
+
 
 # Load data from file to send as an API POST request.
 # We prepare a DataFrame with the public test set + riders data
 # from the Kaggle challenge.
-test = pd.read_csv('utils\data')
+test = pd.read_csv('utils\data\df_test.csv')
 
-
+def read_json_file(filename):
+    with open(filename, 'r') as f:
+        cache = f.read()
+        data = eval(cache)
+    return data
 
 
 
@@ -53,15 +57,10 @@ print("")
 api_response = requests.post(url, json=feature_vector_json)
 
 # Display the prediction result 
-if type(api_response.json()) != float:  
-    print("Received POST response:")
-    print("*"*50)
-    print(f"API prediction result: {api_response.json()[1]}")
-    print(f"The response took: {api_response.elapsed.total_seconds()} seconds")
-    print("*"*50)
-else :          
-    print("Received POST response:")
-    print("*"*50)
-    print(f"API prediction result: {api_response.json()}")
-    print(f"The response took: {api_response.elapsed.total_seconds()} seconds")
-    print("*"*50)
+print("Received POST response:")
+print("*"*50)
+print(f"API prediction result: {api_response.json()[0]}")
+print(f"The response took: {api_response.elapsed.total_seconds()} seconds")
+print("*"*50)
+        
+
