@@ -48,15 +48,15 @@ def _preprocess_data(data):
     # ---------------------------------------------------------------
 
     # ----------- Replace this code with your own preprocessing steps --------
-   
+   #Filling in the missing values with the mean
 df_train['Valencia_pressure'].fillna(df_train['Valencia_pressure'].mean(), inplace = True)
-
+#converting Valencia_wind_deg and Seville_pressure columns from categorical to numerical datatypes.
 
 df_train['Valencia_wind_deg'] = df_train['Valencia_wind_deg'].str.extract('(\d+)').astype('int64')
 df_train['Seville_pressure'] = df_train['Seville_pressure'].str.extract('(\d+)').astype('int64')
 #The next step is to engineer new features from the time column
 
-
+#Engineering New Features ( i.e Desampling the Time) to further expand our training data set
 
 df_train['Year']  = df_train['time'].astype('datetime64').dt.year
 df_train['Month_of_year']  = df_train['time'].astype('datetime64').dt.month
@@ -73,27 +73,20 @@ plt.figure(figsize=[10,6])
 sns.heatmap(Time_df.corr(),annot=True )
 #<AxesSubplot:>
 
-<<<<<<< Updated upstream
-
-=======
 ##Looking at our heatmap tells us that we have high Multicollinearity present in our new features. The features involved are -
 
 #Week of the year. Day of the year. Month of the year. Day of the week. Hour of the week. We would have to drop one of the features that have high correlation with each other.
 
 #Alongside dropping these features mentioned above, we would also be dropping the time and Unnamed column.
->>>>>>> Stashed changes
 
 df_train = df_train.drop(columns=['Week_of_year','Day_of_year','Hour_of_week', 'Unnamed: 0','time'])
 plt.figure(figsize=[35,15])
 sns.heatmap(df_train.corr(),annot=True )
 #<AxesSubplot:>
 
-<<<<<<< Updated upstream
-=======
 #Just as we mentioned in our EDA, we noticed the presence of high correlations between the predictor columns and also possible outliers.
 
 #Here, we would have to drop these columns to improve the performance of our model and reduce any possibility of overfitting in our model. Let us check if this approach corresponds with our feature selection. Using SelectKBest and Chi2 to perform Feature Selection.
->>>>>>> Stashed changes
 
 ## Splitting our data into dependent Variable and Independent Variable
 X = df_train.drop(columns = 'load_shortfall_3h')
@@ -106,14 +99,11 @@ featureScores = pd.concat([dfcolumns, dfscores], axis=1)
 featureScores.columns = ['Features', 'Score']
 new_X = featureScores.sort_values('Score',ascending=False).head(40)
 new_X.head(40) #To get the most important features based on their score 
-<<<<<<< Updated upstream
- having multicollinearity
-=======
 #Features	Score
-18	Barcelona_pressure	1.189344e+09
-9	Bilbao_wind_deg	4.574064e+05
-8	Seville_clouds_all	3.049398e+05
-11	Barcelona_wind_deg	2.920143e+05
+#18	Barcelona_pressure	1.189344e+09
+#9	Bilbao_wind_deg	4.574064e+05
+#8	Seville_clouds_all	3.049398e+05
+#11	Barcelona_wind_deg	2.920143e+05
 12	Madrid_clouds_all	2.862344e+05
 6	Bilbao_clouds_all	1.705834e+05
 32	Bilbao_weather_id	1.307308e+05
@@ -153,7 +143,6 @@ new_X.head(40) #To get the most important features based on their score
 This result backups our claim, were we saw in the heatmap multicollinearity between features, and from our feature selection, we can see those features as having the lowest significance in our data.
 
 Dropping Outliers We have one more thing to do, which is to remove possible outliers. Also, we will select the important features for our model thus dropping others having multicollinearity
->>>>>>> Stashed changes
 
 X = X[['Madrid_wind_speed', 'Valencia_wind_deg', 'Bilbao_rain_1h',
        'Valencia_wind_speed', 'Seville_humidity', 'Madrid_humidity',
@@ -170,6 +159,13 @@ plt.figure(figsize=[20,10])
 sns.heatmap(X.corr(),annot=True )
 <AxesSubplot:>
 
+We have been able to remove the collinearity seen in previous heatmaps and also selected specific features to train our model with
+
+Feature Scaling Lastly, before we carry out modeling, it is important to scale our data. As we saw during the EDA, we noticed how some columns(features) had values that were out of range when we compared their mean, max and standard deviation. This can result to bias in the model during decision making, thus it is important to convert all the column values to a certain range/scale.
+
+What is Feature Scaling? Feature scaling is the process of normalising the range of features in a dataset. Real-world datasets often contain features that are varying in degrees of magnitude, range and units. Therefore, in order for machine learning models to interpret these features on the same scale, we need to perform feature scaling.
+
+In this project, we will be carrying out Standard Scaling, becasue of it's robustness to outliers
 
 # Create standardization object
 scaler = StandardScaler()
@@ -177,6 +173,12 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 X_scaled = pd.DataFrame(X_scaled,columns=X.columns)
 X_scaled.head()
-
+Madrid_wind_speed	Valencia_wind_deg	Bilbao_rain_1h	Valencia_wind_speed	Seville_humidity	Madrid_humidity	Bilbao_clouds_all	Bilbao_wind_speed	Seville_clouds_all	Bilbao_wind_deg	...	Bilbao_pressure	Seville_weather_id	Valencia_pressure	Bilbao_weather_id	Valencia_humidity	Year	Month_of_year	Day_of_month	Day_of_week	Hour_of_day
+0	-0.950708	-0.096053	-0.362123	-0.796169	0.516117	0.270621	-1.335491	-0.501451	-0.565065	0.630823	...	1.718219	0.352274	-1.129531e+00	0.649842	0.540928	-1.226179	-1.602429	-1.675368	-0.00274	-1.090901
+1	-1.130863	1.641580	-0.362123	-0.381412	0.692953	0.298017	-1.335491	-0.501451	-0.565065	0.607959	...	1.784583	0.352274	-9.289340e-01	0.649842	0.298645	-1.226179	-1.602429	-1.675368	-0.00274	-0.654451
+2	-0.770554	1.294054	-0.362123	-0.657917	0.383491	0.284319	-1.335491	-0.501451	-0.565065	0.542632	...	1.817765	0.352274	-8.085757e-01	0.649842	0.021750	-1.226179	-1.602429	-1.675368	-0.00274	-0.218001
+3	-0.770554	0.946527	-0.362123	-0.657917	0.118238	-0.044439	-1.335491	-0.501451	-0.565065	0.398912	...	1.817765	0.352274	-3.672620e-01	0.649842	-0.583957	-1.226179	-1.602429	-1.675368	-0.00274	0.218449
+4	-0.770554	0.599000	-0.362123	-0.657917	-0.161751	-0.017043	-1.274045	-0.894581	-0.565065	0.255192	...	1.751401	0.352274	2.736630e-13	0.649842	-0.358980	-1.226179	-1.602429	-1.675368	-0.00274	0.654899
+5 rows × 34 columns
 
 y.head()
