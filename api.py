@@ -49,7 +49,9 @@ def model_prediction():
     output = make_prediction(data, static_model)
     # We finally package this prediction as a JSON object to deliver a valid
     # response with our API.
-    return jsonify(output)
+    output_list=[]
+    output_list.append(output)
+    return jsonify(output_list)
 
 # Configure Server Startup properties.
 # Note:
