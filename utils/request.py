@@ -29,10 +29,46 @@ import json
 # from the Kaggle challenge.
 test = pd.read_csv('utils\data\df_test.csv')
 
-def read_json_file(filename):
-    with open(filename, 'r') as f:
-        cache = f.read()
-        data = eval(cache)
+
+
+
+
+
+
+
+# Display the prediction result 
+import requests
+import re
+import json
+from datetime import datetime
+
+quarterdateformat = '%Y-%m-%d'
+
+
+def camelize(string):
+    return "".join(string.split(" "))
+
+def convert_types(d):
+    for k, v in d.items():
+        #print(k, type(v))
+        new_v = v
+        if type(v) is str:
+            #match for float
+            if re.match('[-+]?[0-9]*\.[0-9]+', v):  
+                new_v = float(v)
+
+            #match for date
+            if re.match('([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))', v):  
+                new_v = datetime.strptime(v, quarterdateformat).date()
+
+
+        d[k] = new_v
+    d = {camelize(k): v for k, v in d.items()}
+    return d
+
+url = 'http://54.72.214.68:5000/api_v0.1'
+params = {'datatyupe' : 'json'}
+r = requests.get(url, params)
     return data
 
 
