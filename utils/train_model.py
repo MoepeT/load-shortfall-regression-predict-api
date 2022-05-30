@@ -26,4 +26,3 @@ lm_regression.fit(X_train, y_train)
 save_path = '../assets/trained-models/load_shortfall_simple_lm_regression.pkl'
 print (f"Training completed. Saving model to: {save_path}")
 pickle.dump(lm_regression, open(save_path,'wb'))
-
