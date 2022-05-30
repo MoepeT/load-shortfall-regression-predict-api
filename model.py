@@ -49,6 +49,9 @@ def _preprocess_data(data):
 
     # ----------- Replace this code with your own preprocessing steps --------
    #Filling in the missing values with the mean
+
+df_train = pd.read_csv('df_train.csv') # load the train data
+df_test = pd.read_csv('df_test.csv')
 df_train['Valencia_pressure'].fillna(df_train['Valencia_pressure'].mean(), inplace = True)
 #converting Valencia_wind_deg and Seville_pressure columns from categorical to numerical datatypes.
 
@@ -104,45 +107,7 @@ new_X.head(40) #To get the most important features based on their score
 #9	Bilbao_wind_deg	4.574064e+05
 #8	Seville_clouds_all	3.049398e+05
 #11	Barcelona_wind_deg	2.920143e+05
-12	Madrid_clouds_all	2.862344e+05
-6	Bilbao_clouds_all	1.705834e+05
-32	Bilbao_weather_id	1.307308e+05
-24	Barcelona_weather_id	7.121392e+04
-5	Madrid_humidity	7.087652e+04
-17	Bilbao_snow_3h	6.812971e+04
-4	Seville_humidity	5.699050e+04
-23	Madrid_weather_id	5.445955e+04
-26	Seville_weather_id	4.703123e+04
-34	Valencia_humidity	3.980066e+04
-48	Day_of_month	3.443358e+04
-50	Hour_of_day	3.167767e+04
-15	Seville_pressure	2.687804e+04
-14	Barcelona_rain_1h	2.171411e+04
-3	Valencia_wind_speed	1.601889e+04
-47	Month_of_year	1.293213e+04
-1	Valencia_wind_deg	1.104442e+04
-7	Bilbao_wind_speed	1.092892e+04
-0	Madrid_wind_speed	1.017244e+04
-49	Day_of_week	9.265478e+03
-13	Seville_wind_speed	8.132635e+03
-10	Barcelona_wind_speed	8.016649e+03
-2	Bilbao_rain_1h	7.544582e+03
-16	Seville_rain_1h	5.397681e+03
-20	Madrid_rain_1h	4.226512e+03
-29	Madrid_pressure	3.436256e+03
-22	Valencia_snow_3h	3.110384e+03
-37	Madrid_temp_max	2.281817e+03
-44	Madrid_temp	2.106589e+03
-45	Madrid_temp_min	2.054920e+03
-28	Seville_temp_max	1.847097e+03
-43	Seville_temp_min	1.589866e+03
-33	Seville_temp	1.483057e+03
-30	Valencia_temp_max	1.365686e+03
-36	Barcelona_temp_max	1.260724e+03
-31	Valencia_temp	1.229799e+03
-This result backups our claim, were we saw in the heatmap multicollinearity between features, and from our feature selection, we can see those features as having the lowest significance in our data.
 
-Dropping Outliers We have one more thing to do, which is to remove possible outliers. Also, we will select the important features for our model thus dropping others having multicollinearity
 
 X = X[['Madrid_wind_speed', 'Valencia_wind_deg', 'Bilbao_rain_1h',
        'Valencia_wind_speed', 'Seville_humidity', 'Madrid_humidity',
@@ -157,15 +122,9 @@ X = X[['Madrid_wind_speed', 'Valencia_wind_deg', 'Bilbao_rain_1h',
         'Valencia_humidity', 'Year', 'Month_of_year', 'Day_of_month', 'Day_of_week', 'Hour_of_day']]
 plt.figure(figsize=[20,10])
 sns.heatmap(X.corr(),annot=True )
-<AxesSubplot:>
+#<AxesSubplot:>
 
-We have been able to remove the collinearity seen in previous heatmaps and also selected specific features to train our model with
 
-Feature Scaling Lastly, before we carry out modeling, it is important to scale our data. As we saw during the EDA, we noticed how some columns(features) had values that were out of range when we compared their mean, max and standard deviation. This can result to bias in the model during decision making, thus it is important to convert all the column values to a certain range/scale.
-
-What is Feature Scaling? Feature scaling is the process of normalising the range of features in a dataset. Real-world datasets often contain features that are varying in degrees of magnitude, range and units. Therefore, in order for machine learning models to interpret these features on the same scale, we need to perform feature scaling.
-
-In this project, we will be carrying out Standard Scaling, becasue of it's robustness to outliers
 
 # Create standardization object
 scaler = StandardScaler()
@@ -173,12 +132,6 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 X_scaled = pd.DataFrame(X_scaled,columns=X.columns)
 X_scaled.head()
-Madrid_wind_speed	Valencia_wind_deg	Bilbao_rain_1h	Valencia_wind_speed	Seville_humidity	Madrid_humidity	Bilbao_clouds_all	Bilbao_wind_speed	Seville_clouds_all	Bilbao_wind_deg	...	Bilbao_pressure	Seville_weather_id	Valencia_pressure	Bilbao_weather_id	Valencia_humidity	Year	Month_of_year	Day_of_month	Day_of_week	Hour_of_day
-0	-0.950708	-0.096053	-0.362123	-0.796169	0.516117	0.270621	-1.335491	-0.501451	-0.565065	0.630823	...	1.718219	0.352274	-1.129531e+00	0.649842	0.540928	-1.226179	-1.602429	-1.675368	-0.00274	-1.090901
-1	-1.130863	1.641580	-0.362123	-0.381412	0.692953	0.298017	-1.335491	-0.501451	-0.565065	0.607959	...	1.784583	0.352274	-9.289340e-01	0.649842	0.298645	-1.226179	-1.602429	-1.675368	-0.00274	-0.654451
-2	-0.770554	1.294054	-0.362123	-0.657917	0.383491	0.284319	-1.335491	-0.501451	-0.565065	0.542632	...	1.817765	0.352274	-8.085757e-01	0.649842	0.021750	-1.226179	-1.602429	-1.675368	-0.00274	-0.218001
-3	-0.770554	0.946527	-0.362123	-0.657917	0.118238	-0.044439	-1.335491	-0.501451	-0.565065	0.398912	...	1.817765	0.352274	-3.672620e-01	0.649842	-0.583957	-1.226179	-1.602429	-1.675368	-0.00274	0.218449
-4	-0.770554	0.599000	-0.362123	-0.657917	-0.161751	-0.017043	-1.274045	-0.894581	-0.565065	0.255192	...	1.751401	0.352274	2.736630e-13	0.649842	-0.358980	-1.226179	-1.602429	-1.675368	-0.00274	0.654899
-5 rows × 34 columns
+
 
 y.head()
