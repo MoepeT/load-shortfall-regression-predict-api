@@ -1,52 +1,16 @@
 """
     Simple file to create a sklearn model for deployment in our API
-
     Author: Explore Data Science Academy
-
     Description: This script is responsible for training a simple linear
     regression model which is used within the API for initial demonstration
     purposes.
-
 """
+
 # Dependencies
 import pandas as pd
 import pickle
 from sklearn.linear_model import LinearRegression
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
- #%matplotlib inline
-import seaborn as sns
-import plotly.express as px
-from statsmodels.graphics.correlation import plot_corr
 
-
-# Libraries for data preparation and model building
-#from sklearn.linear_model import LinearRegrepip #install plotlyssion
-from sklearn.model_selection import train_test_split
-from sklearn import metrics 
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.metrics import accuracy_score
-from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import chi2
-from sklearn.metrics import mean_squared_error as MSE
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import r2_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVR
-
-
-
-from sklearn.linear_model import Lasso
-from sklearn.linear_model import Ridge
-
-
-import warnings
-
-warnings.filterwarnings("ignore")
-
-
-import pickle
 # Fetch training data and preprocess for modeling
 train = pd.read_csv('./data/df_train.csv')
 
@@ -54,19 +18,12 @@ y_train = train[['load_shortfall_3h']]
 X_train = train[['Madrid_wind_speed','Bilbao_rain_1h','Valencia_wind_speed']]
 
 # Fit model
-# Our forest consists of 200 trees with a max depth of 8 
-RF = RandomForestRegressor(n_estimators=200, max_depth=8)
-# Fitting the model
-RF.fit(X_train,y_train)
-RF_predict = RF.predict(X_test)
+lm_regression = LinearRegression(normalize=True)
+print ("Training Model...")
+lm_regression.fit(X_train, y_train)
 
-#saving the pickle file
-RF_save_path = "RF.pkl"
-with open(RF_save_path,'wb') as file:
-    pickle.dump(RF,file)
-    
-#en_load_path = "v_reg.pkl"
-RF_load_path = "RF.pkl"
-with open(RF_load_path,'rb') as file:
-    unpickled_RF = pickle.load(file)    
+# Pickle model for use within our API
+save_path = '../assets/trained-models/load_shortfall_simple_lm_regression.pkl'
+print (f"Training completed. Saving model to: {save_path}")
+pickle.dump(lm_regression, open(save_path,'wb'))
 
